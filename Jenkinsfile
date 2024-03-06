@@ -7,10 +7,10 @@ pipeline {
         DOCKERFILE_PATH = 'Dockerfile'
         ACR_NAME = 'airflow1.azurecr.io'
         AZURE_CREDENTIALS_ID = 'acrmps'
-        // HELM_CHART_PATH = 'airflow1'
-        // HELM_RELEASE_NAME = 'airflow1'
-        // K8S_NAMESPACE = 'default'
-        // K8S_CREDENTIALS_ID = 'k8s' // Update with your actual Kubernetes credentials ID
+        HELM_CHART_PATH = 'airflow1'
+        HELM_RELEASE_NAME = 'airflow1'
+        K8S_NAMESPACE = 'default'
+        K8S_CREDENTIALS_ID = 'k8s' // Update with your actual Kubernetes credentials ID
     }
 
     stages {
@@ -58,39 +58,39 @@ pipeline {
             }
         }
 
-    //     stage('Update Helm Chart Version') {
-    //         // Update appVersion in Helm Chart's Chart.yaml
-    //         steps {
-    //             script {
-    //                 def updatedAppVersion = "${BUILD_NUMBER}"
-    //                 // Update appVersion in Chart.yaml with the current build number
-    //                 sh 'sed -i "s|appVersion: .*|appVersion: \"${updatedAppVersion}\"|" ${HELM_CHART_PATH}/Chart.yaml'
+        stage('Update Helm Chart Version') {
+            // Update appVersion in Helm Chart's Chart.yaml
+            steps {
+                script {
+                    def updatedAppVersion = "${BUILD_NUMBER}"
+                    // Update appVersion in Chart.yaml with the current build number
+                    sh 'sed -i "s|appVersion: .*|appVersion: \"${updatedAppVersion}\"|" ${HELM_CHART_PATH}/Chart.yaml'
 
-    //             }
-    //         }
-    //     }
+                }
+            }
+        }
 
-    //     stage('Kubernetes and Helm Deployment') {
-    //         // Deploy Helm chart to Kubernetes
-    //         steps {
-    //             script {
-    //                 // Use withKubeConfig to set up Kubernetes credentials
-    //                 withKubeConfig(
-    //                     credentialsId: K8S_CREDENTIALS_ID,
-    //                     serverUrl: '',
-    //                     caCertificate: '',
-    //                     namespace: K8S_NAMESPACE,
-    //                     contextName: ''
-    //                 ) {
-    //                     // Deploy Helm chart
-    //                     dir(HELM_CHART_PATH) {
-    //                         sh "helm upgrade --install ${HELM_RELEASE_NAME} . --namespace=${K8S_NAMESPACE} --set image.repository=${ACR_NAME}/airflow1,image.tag=${BUILD_NUMBER}"
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+        stage('Kubernetes and Helm Deployment') {
+            // Deploy Helm chart to Kubernetes
+            steps {
+                script {
+                    // Use withKubeConfig to set up Kubernetes credentials
+                    withKubeConfig(
+                        credentialsId: K8S_CREDENTIALS_ID,
+                        serverUrl: '',
+                        caCertificate: '',
+                        namespace: K8S_NAMESPACE,
+                        contextName: ''
+                    ) {
+                        // Deploy Helm chart
+                        dir(HELM_CHART_PATH) {
+                            sh "helm upgrade --install ${HELM_RELEASE_NAME} . --namespace=${K8S_NAMESPACE} --set image.repository=${ACR_NAME}/airflow1,image.tag=${BUILD_NUMBER}"
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     post {
         success {

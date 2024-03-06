@@ -15,7 +15,6 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            // Check out code from the GitHub repository
             steps {
                 script {
                     echo "Checking out code from ${GITHUB_REPO_URL}"
@@ -25,68 +24,34 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            // Build Docker image from the specified Dockerfile
             steps {
                 script {
                     echo "Building Docker image from ${DOCKERFILE_PATH}"
-                    sh "docker build -t airflow1:${BUILD_NUMBER} -f ${DOCKERFILE_PATH} ."
+                    sh "docker build -t ${ACR_NAME}/airflow1:${BUILD_NUMBER} -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
 
         stage('Push to ACR') {
-            // Push Docker image to Azure Container Registry (ACR)
             steps {
                 script {
                     echo "Pushing Docker image to ${ACR_NAME}.azurecr.io"
-                    withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID, )]) {
-                        // Log in to Azure CLI using Service Principal credentials
+                    withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
                         sh "az login --service-principal --username \${AZURE_CLIENT_ID} --password \${AZURE_CLIENT_SECRET} --tenant \${AZURE_TENANT_ID}"
-
                         sh "az acr login --name ${ACR_NAME}"
-
-                        // Tag the Docker image for ACR
-                        sh "docker tag airflow1:${BUILD_NUMBER} ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
-
-                        // Push the Docker image to ACR
+                        sh "docker tag ${ACR_NAME}/airflow1:${BUILD_NUMBER} ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
                         sh "docker push ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
-
-                        // Log out from Azure CLI
                         sh "az logout"
                     }
                 }
             }
         }
 
-        stage('Update Helm Chart Version') {
-            // Update appVersion in Helm Chart's Chart.yaml
+        stage('Deploy') {
             steps {
                 script {
-                    def updatedAppVersion = "${BUILD_NUMBER}"
-                    // Update appVersion in Chart.yaml with the current build number
-                    sh 'sed -i "s|appVersion: .*|appVersion: \"${updatedAppVersion}\"|" ${HELM_CHART_PATH}/Chart.yaml'
-
-                }
-            }
-        }
-
-        stage('Kubernetes and Helm Deployment') {
-            // Deploy Helm chart to Kubernetes
-            steps {
-                script {
-                    // Use withKubeConfig to set up Kubernetes credentials
-                    withKubeConfig(
-                        credentialsId: K8S_CREDENTIALS_ID,
-                        serverUrl: '',
-                        caCertificate: '',
-                        namespace: K8S_NAMESPACE,
-                        contextName: ''
-                    ) {
-                        // Deploy Helm chart
-                        dir(HELM_CHART_PATH) {
-                            sh "helm upgrade --install ${HELM_RELEASE_NAME} . --namespace=${K8S_NAMESPACE} --set image.repository=${ACR_NAME}/airflow1,image.tag=${BUILD_NUMBER}"
-                        }
-                    }
+                    echo "Deploying Docker image using docker run"
+                    sh "docker run -p 8081:8080 -v /home/ubuntu/airflow/dags:/opt/airflow/dags -d ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
                 }
             }
         }
@@ -94,7 +59,6 @@ pipeline {
 
     post {
         success {
-            // Cleanup Jenkins workspace and remove Docker image if all stages are successful
             cleanWs()
             sh "docker rmi -f ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
         }

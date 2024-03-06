@@ -13,7 +13,7 @@ airflow users create \
   --role Admin \
   --email omkarkapase242@gmail.com
 
-airflow scheduler
-
 airflow webserver --port 8080
+
+airflow scheduler
 

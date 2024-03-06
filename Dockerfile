@@ -13,6 +13,9 @@ ARG DAGS_BRANCH=main
 
 RUN git clone --branch ${DAGS_BRANCH} ${DAGS_REPO} /usr/local/airflow/dags
 
+# Switch back to the 'airflow' user
+USER airflow
+
 # Install Python dependencies
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
@@ -21,7 +24,6 @@ RUN pip install --no-cache-dir -r /requirements.txt
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-USER airflow
 ENTRYPOINT ["/bin/bash", "/start.sh"]
 
 

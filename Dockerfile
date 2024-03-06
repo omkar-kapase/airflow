@@ -20,9 +20,15 @@ USER airflow
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
 
-# Copy start script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# Copy start script to the /usr/local/airflow directory
+COPY start.sh /usr/local/airflow/start.sh
+RUN chmod +x /usr/local/airflow/start.sh
+
+# Set the working directory
+WORKDIR /usr/local/airflow
+
+ENTRYPOINT ["/bin/bash", "start.sh"]
+
 
 ENTRYPOINT ["/bin/bash", "/start.sh"]
 

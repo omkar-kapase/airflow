@@ -7,9 +7,6 @@ RUN apt-get update && apt-get install -y \
     git \
     wget
 
-# Create the 'airflow' group and user
-RUN groupadd -g 50000 airflow && useradd -u 50000 -g airflow airflow
-
 # Clone the GitHub repo with Airflow DAGs
 ARG DAGS_REPO=https://github.com/omkar-kapase/airflow.git
 ARG DAGS_BRANCH=main
@@ -31,10 +28,6 @@ WORKDIR /usr/local/airflow
 
 ENTRYPOINT ["/bin/bash", "start.sh"]
 
-
-
-
-ENTRYPOINT ["/bin/bash", "/start.sh"]
 
 
 # FROM apache/airflow:2.5.1-python3.9

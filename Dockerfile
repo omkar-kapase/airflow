@@ -1,32 +1,49 @@
+
 FROM apache/airflow:2.5.1-python3.9
+
+COPY requirements.txt /requirements.txt
+
+RUN pip install --no-cache-dir -r /requirements.txt
 
 USER root
 
-# Install git
 RUN apt-get update && apt-get install -y \
-    git \
     wget
-
-# Clone the GitHub repo with Airflow DAGs
-ARG DAGS_REPO=https://github.com/omkar-kapase/airflow.git
-ARG DAGS_BRANCH=main
-
-RUN git clone --branch ${DAGS_BRANCH} ${DAGS_REPO} /usr/local/airflow/dags
-
-# Switch back to the 'airflow' user
+COPY airflow/dags /opt/airflow/dags
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 USER airflow
+ENTRYPOINT ["/bin/bash","/start.sh"]
 
-# Install Python dependencies
-COPY requirements.txt /requirements.txt
-RUN pip install --no-cache-dir -r /requirements.txt
+# FROM apache/airflow:2.5.1-python3.9
 
-# Copy start script to the /usr/local/airflow directory with execute permission
-COPY --chown=airflow:airflow start.sh /usr/local/airflow/start.sh
+# USER root
 
-# Set the working directory
-WORKDIR /usr/local/airflow
+# # Install git
+# RUN apt-get update && apt-get install -y \
+#     git \
+#     wget
 
-ENTRYPOINT ["/bin/bash", "start.sh"]
+# # Clone the GitHub repo with Airflow DAGs
+# ARG DAGS_REPO=https://github.com/omkar-kapase/airflow.git
+# ARG DAGS_BRANCH=main
+
+# RUN git clone --branch ${DAGS_BRANCH} ${DAGS_REPO} /usr/local/airflow/dags
+
+# # Switch back to the 'airflow' user
+# USER airflow
+
+# # Install Python dependencies
+# COPY requirements.txt /requirements.txt
+# RUN pip install --no-cache-dir -r /requirements.txt
+
+# # Copy start script to the /usr/local/airflow directory with execute permission
+# COPY --chown=airflow:airflow start.sh /usr/local/airflow/start.sh
+
+# # Set the working directory
+# WORKDIR /usr/local/airflow
+
+# ENTRYPOINT ["/bin/bash", "start.sh"]
 
 
 
@@ -40,7 +57,7 @@ ENTRYPOINT ["/bin/bash", "start.sh"]
 
 # RUN apt-get update && apt-get install -y \
 #     wget
-
+# COPY airflow/dags /opt/airflow/dags
 # COPY start.sh /start.sh
 # RUN chmod +x /start.sh
 # USER airflow

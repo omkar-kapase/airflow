@@ -47,14 +47,14 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    echo "Deploying Docker image using docker run"
-                    sh "docker run -p 8081:8080 -v /home/ubuntu/airflow/dags:/opt/airflow/dags -d ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
-                }
-            }
-        }
+        // stage('Deploy') {
+        //     steps {
+        //         script {
+        //             echo "Deploying Docker image using docker run"
+        //             sh "docker run -p 8081:8080 -v /usr/local/airflow/dags:/opt/airflow/dags -d ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
+        //         }
+        //     }
+        // }
     }
 
     post {

@@ -23,4 +23,3 @@ mysql_insert_task = PythonOperator(
     dag=dag,
     retries=3
 )
-

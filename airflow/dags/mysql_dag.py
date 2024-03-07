@@ -20,6 +20,5 @@ dag = DAG(
 mysql_insert_task = PythonOperator(
     task_id='mysql_insert_task',
     python_callable=execute_mysql_query,
-    dag=dag,
-    retries=3
+    dag=dag
 )

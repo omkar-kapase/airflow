@@ -24,7 +24,7 @@ mysql_insert_task = PythonOperator(
     retries=3
 )
 
-root@ubuntugui:~/airflow/dags# cat mysql_script.py
+#root@ubuntugui:~/airflow/dags# cat mysql_script.py
 import mysql.connector
 
 def execute_mysql_query():

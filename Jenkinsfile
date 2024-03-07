@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image from ${DOCKERFILE_PATH}"
-                    sh "docker build -t ${ACR_NAME}/airflow1:${BUILD_NUMBER} -f ${DOCKERFILE_PATH} ."
+                    sh "docker build -t ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
@@ -39,8 +39,8 @@ pipeline {
                     withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
                         sh "az login --service-principal --username \${AZURE_CLIENT_ID} --password \${AZURE_CLIENT_SECRET} --tenant \${AZURE_TENANT_ID}"
                         sh "az acr login --name ${ACR_NAME}"
-                        sh "docker tag ${ACR_NAME}/airflow1:${BUILD_NUMBER} ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
-                        sh "docker push ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
+                        sh "docker tag ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
+                        sh "docker push ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
                         sh "az logout"
                     }
                 }
@@ -60,7 +60,7 @@ pipeline {
     post {
         success {
             cleanWs()
-            sh "docker rmi -f ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
+            sh "docker rmi -f ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
         }
     }
 }

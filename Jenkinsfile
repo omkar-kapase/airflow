@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image from ${DOCKERFILE_PATH}"
-                    sh "docker build -t ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest -f ${DOCKERFILE_PATH} ."
+                    sh "docker build -t ${ACR_NAME}/airflow1:latest -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
@@ -39,8 +39,8 @@ pipeline {
                     withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
                         sh "az login --service-principal --username \${AZURE_CLIENT_ID} --password \${AZURE_CLIENT_SECRET} --tenant \${AZURE_TENANT_ID}"
                         sh "az acr login --name ${ACR_NAME}"
-                        sh "docker tag ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
-                        sh "docker push ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
+                        sh "docker tag ${ACR_NAME}/airflow1:latest ${ACR_NAME}/airflow1:latest"
+                        sh "docker push ${ACR_NAME}/airflow1:latest"
                         sh "az logout"
                     }
                 }
@@ -51,7 +51,7 @@ pipeline {
         //     steps {
         //         script {
         //             echo "Deploying Docker image using docker run"
-        //             sh "docker run -p 8081:8080 -v /usr/local/airflow/dags:/opt/airflow/dags -d ${ACR_NAME}/airflow1:${BUILD_NUMBER}"
+        //             sh "docker run -p 8081:8080 -v /usr/local/airflow/dags:/opt/airflow/dags -d ${ACR_NAME}/airflow1:"
         //         }
         //     }
         // }
@@ -60,7 +60,7 @@ pipeline {
     post {
         success {
             cleanWs()
-            sh "docker rmi -f ${ACR_NAME}/airflow1${BUILD_NUMBER}:latest"
+            sh "docker rmi -f ${ACR_NAME}/airflow1:latest"
         }
     }
 }

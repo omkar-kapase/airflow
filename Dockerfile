@@ -16,7 +16,7 @@ USER airflow
 ENTRYPOINT ["/bin/bash","/start.sh"]
 
 # CMD instruction for the additional 'airflow scheduler' command
-#CMD ["airflow", "scheduler"]
+CMD ["airflow", "scheduler"]
 
 # FROM apache/airflow:2.5.1-python3.9
 

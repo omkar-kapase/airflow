@@ -5,8 +5,8 @@ pipeline {
         // Define environment variables
         GITHUB_REPO_URL = 'https://github.com/omkar-kapase/airflow.git'
         DOCKERFILE_PATH = 'Dockerfile'
-        ACR_NAME = 'airflow1.azurecr.io'
-        AZURE_CREDENTIALS_ID = 'acrmps'
+        ACR_NAME = 'airflowim.azurecr.io'
+        AZURE_CREDENTIALS_ID = 'acr-mnp'
         HELM_CHART_PATH = 'airflow1'
         HELM_RELEASE_NAME = 'airflow1'
         K8S_NAMESPACE = 'default'
@@ -35,7 +35,7 @@ pipeline {
         stage('Push to ACR') {
             steps {
                 script {
-                    echo "Pushing Docker image to ${ACR_NAME}.azurecr.io"
+                    echo "Pushing Docker image to ${ACR_NAME}.airflowim.azurecr.io"
                     withCredentials([azureServicePrincipal(credentialsId: AZURE_CREDENTIALS_ID)]) {
                         sh "az login --service-principal --username \${AZURE_CLIENT_ID} --password \${AZURE_CLIENT_SECRET} --tenant \${AZURE_TENANT_ID}"
                         sh "az acr login --name ${ACR_NAME}"

@@ -9,3 +9,5 @@ mysql-connector-python>=8.0.29
 apache-airflow-providers-http
 
 GitPython
+
+apache-airflow-providers-docker

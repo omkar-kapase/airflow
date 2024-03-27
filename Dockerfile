@@ -4,17 +4,36 @@ FROM apache/airflow:2.5.1-python3.9
 COPY requirements.txt /requirements.txt
 
 RUN pip install --no-cache-dir -r /requirements.txt
-RUN pip install GitPython
+RUN pip install gitpython
 
 USER root
 
 RUN apt-get update && apt-get install -y \
+    git \
     wget
+
 COPY airflow/dags /opt/airflow/dags
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 USER airflow
 ENTRYPOINT ["/bin/bash","/start.sh"]
+# FROM apache/airflow:2.5.1-python3.9
+
+# COPY requirements.txt /requirements.txt
+
+# RUN pip install --no-cache-dir -r /requirements.txt
+# RUN pip install gitpython
+
+
+# USER root
+
+# RUN apt-get update && apt-get install -y \
+#     wget 
+# COPY airflow/dags /opt/airflow/dags
+# COPY start.sh /start.sh
+# RUN chmod +x /start.sh
+# USER airflow
+# ENTRYPOINT ["/bin/bash","/start.sh"]
 
 # CMD instruction for the additional 'airflow scheduler' command
 #CMD ["airflow", "scheduler"]
